@@ -1,0 +1,74 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand-blue: #00319A;
+  --color-brand-blue-hover: #00226b;
+  --color-gray-border: #e5e7eb;
+  --color-gray-dark: #111827;
+  --color-gray-muted: #4b5563;
+  --color-gray-light: #f9fafb;
+  
+  --font-outfit: var(--font-outfit);
+  --font-jakarta: var(--font-jakarta);
+}
+
+:root {
+  --background: #ffffff;
+  --foreground: #111827;
+  --font-outfit: 'Outfit', sans-serif;
+  --font-jakarta: 'Plus Jakarta Sans', sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-outfit);
+  overflow-x: hidden;
+}
+
+/* Custom scrollbar - Neo-Minimalist Style */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #ffffff;
+  border-left: 1px solid #e5e7eb;
+}
+::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #00319A;
+}
+
+/* Text selection */
+::selection {
+  background-color: #00319A;
+  color: #ffffff;
+}
+
+/* Technical grid background */
+.tech-grid {
+  background-image: 
+    linear-gradient(to right, rgba(229, 231, 235, 0.5) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(229, 231, 235, 0.5) 1px, transparent 1px);
+  background-size: 2rem 2rem;
+}
+
+/* Rigid panel utility */
+.rigid-panel {
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.rigid-panel-hover:hover {
+  border-color: #00319A;
+  box-shadow: 6px 6px 0px rgba(0, 49, 154, 0.08);
+}
+
