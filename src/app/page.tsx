@@ -18,9 +18,138 @@ import {
 import Header from "@/components/Header";
 import PortfolioShowcase from "@/components/PortfolioShowcase";
 import FormularioPasos from "@/components/FormularioPasos";
+import Resultados from "@/components/Resultados";
 import { motion } from "framer-motion";
+import { useRef } from "react";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useGSAP } from "@gsap/react";
+
+gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 export default function Home() {
+  const mainRef = useRef<HTMLDivElement>(null);
+
+  useGSAP(() => {
+    // Tarea 1: Animación de palabras del hero (Escritura)
+    const words = gsap.utils.toArray<HTMLElement>(".hero-word");
+    if (words.length > 0) {
+      gsap.fromTo(words,
+        {
+          autoAlpha: 0,
+          y: 20,
+          willChange: "transform,opacity"
+        },
+        {
+          autoAlpha: 1,
+          y: 0,
+          duration: 0.55,
+          ease: "power3.out",
+          stagger: 0.05,
+          clearProps: "willChange,transform"
+        }
+      );
+    }
+
+    // Tarea 2: Líneas divisoras tipo "corte" al hacer scroll
+    const groups = gsap.utils.toArray<HTMLElement>(".section-header-group");
+    groups.forEach((group) => {
+      const line = group.querySelector(".section-divider");
+      const text = group.querySelectorAll("span, h2, div:not(.section-divider), p");
+      if (!line) return;
+
+      gsap.set(line, { scaleX: 0 });
+      gsap.set(text, { autoAlpha: 0 });
+
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: group,
+          start: "top 80%",
+          toggleActions: "play none none none"
+        }
+      });
+
+      tl.to(line, {
+        scaleX: 1,
+        duration: 0.9,
+        ease: "power2.inOut",
+        willChange: "transform"
+      })
+      .to(text, {
+        autoAlpha: 1,
+        duration: 0.6,
+        ease: "power2.out",
+        stagger: 0.08
+      }, "-=0.6");
+    });
+
+    // 1. Animación de tarjetas de servicios con ScrollTrigger
+    const cards = gsap.utils.toArray<HTMLElement>(".service-card");
+    if (cards.length > 0) {
+      const mm = gsap.matchMedia();
+      mm.add({
+        isDesktop: "(min-width: 1024px)",
+        isTablet: "(min-width: 768px) and (max-width: 1023px)",
+        isMobile: "(max-width: 767px)"
+      }, (context) => {
+        const { isDesktop, isTablet } = context.conditions as any;
+        const cols = isDesktop ? 3 : (isTablet ? 2 : 1);
+
+        cards.forEach((card, index) => {
+          gsap.fromTo(card,
+            { 
+              autoAlpha: 0, 
+              y: 40,
+              willChange: "transform,opacity"
+            },
+            {
+              autoAlpha: 1,
+              y: 0,
+              duration: 0.7,
+              ease: "power3.out",
+              clearProps: "willChange,transform",
+              delay: (index % cols) * 0.1,
+              scrollTrigger: {
+                trigger: card,
+                start: "top 85%",
+                toggleActions: "play none none none"
+              }
+            }
+          );
+        });
+      });
+    }
+
+    // 2. Micro-interacciones de botones/CTAs
+    const btns = gsap.utils.toArray<HTMLElement>(".hero-btn, .vertical-details-btn");
+    
+    const listeners = btns.map((btn) => {
+      const enter = () => gsap.to(btn, { scale: 1.03, duration: 0.25, ease: "power2.out" });
+      const leave = () => gsap.to(btn, { scale: 1, duration: 0.25, ease: "power2.inOut" });
+      const down = () => gsap.to(btn, { scale: 0.97, duration: 0.1, ease: "power2.out" });
+      const up = () => gsap.to(btn, { scale: 1.03, duration: 0.15, ease: "power2.out" });
+
+      btn.addEventListener("mouseenter", enter);
+      btn.addEventListener("mouseleave", leave);
+      btn.addEventListener("mousedown", down);
+      btn.addEventListener("mouseup", up);
+      btn.addEventListener("focus", enter);
+      btn.addEventListener("blur", leave);
+
+      return { btn, enter, leave, down, up };
+    });
+
+    return () => {
+      listeners.forEach(({ btn, enter, leave, down, up }) => {
+        btn.removeEventListener("mouseenter", enter);
+        btn.removeEventListener("mouseleave", leave);
+        btn.removeEventListener("mousedown", down);
+        btn.removeEventListener("mouseup", up);
+        btn.removeEventListener("focus", enter);
+        btn.removeEventListener("blur", leave);
+      });
+    };
+  }, { scope: mainRef });
   const handleScrollTo = (id: string) => {
     const element = document.getElementById(id);
     if (element) {
@@ -140,7 +269,7 @@ export default function Home() {
       {/* Navigation Header */}
       <Header />
 
-      <main className="flex-1 w-full bg-white">
+      <main ref={mainRef} className="flex-1 w-full bg-white">
         
         {/* HERO SECTION */}
         <section className="border-b border-gray-200 min-h-[90vh] flex flex-col justify-between bg-white pt-20">
@@ -150,38 +279,38 @@ export default function Home() {
             <div className="lg:col-span-8 p-8 md:p-16 flex flex-col justify-center border-b lg:border-b-0 lg:border-r border-gray-200">
               
               {/* Technical Indicator */}
-              <div className="inline-flex items-center gap-2 mb-8">
-                <Sparkles className="w-3.5 h-3.5 text-[#00319A]" />
-                <span className="text-[10px] font-bold tracking-[0.25em] text-[#00319A] uppercase font-jakarta">
-                  01 / PRODUCT DESIGN PORTFOLIO 2026
-                </span>
+              <div className="inline-flex flex-col gap-1 mb-8 overflow-hidden section-header-group">
+                <div className="inline-flex items-center gap-2">
+                  <Sparkles className="w-3.5 h-3.5 text-[#00319A]" />
+                  <span className="text-[10px] font-bold tracking-[0.25em] text-[#00319A] uppercase font-jakarta">
+                    01 / PRODUCT DESIGN PORTFOLIO 2026
+                  </span>
+                </div>
+                <div className="h-[1px] bg-[#00319A]/30 w-full section-divider origin-left" />
               </div>
 
               {/* Headline */}
-              <motion.h1 
-                variants={containerVariants}
-                initial="hidden"
-                animate="visible"
-                className="text-3xl md:text-5xl lg:text-5xl xl:text-6xl font-black font-jakarta tracking-tight leading-[1.2] text-gray-900 uppercase max-w-4xl w-full"
-              >
-                {"ESTÉTICA FUNCIONAL Y ".split("").map((char, index) => (
-                  <motion.span key={`char-1-${index}`} variants={letterVariants} className="inline-block whitespace-pre">
-                    {char}
-                  </motion.span>
+              <h1 className="text-3xl md:text-5xl lg:text-5xl xl:text-6xl font-black font-jakarta tracking-tight leading-[1.2] text-gray-900 uppercase max-w-4xl w-full">
+                {"ESTÉTICA FUNCIONAL Y".split(" ").map((word, index) => (
+                  <span key={`char-1-${index}`} className="hero-word inline-block mr-[0.25em] opacity-0 invisible">
+                    {word}
+                  </span>
                 ))}
-                <span className="text-[#00319A] inline-block">
-                  {"NARRATIVAS VISUALES".split("").map((char, index) => (
-                    <motion.span key={`char-2-${index}`} variants={letterVariants} className="inline-block whitespace-pre">
-                      {char}
-                    </motion.span>
+                {" "}
+                <span className="text-[#00319A] inline-block mr-[0.25em]">
+                  {"NARRATIVAS VISUALES".split(" ").map((word, index) => (
+                    <span key={`char-2-${index}`} className="hero-word inline-block mr-[0.25em] opacity-0 invisible">
+                      {word}
+                    </span>
                   ))}
                 </span>
-                {" QUE TRANSFORMAN NEGOCIOS.".split("").map((char, index) => (
-                  <motion.span key={`char-3-${index}`} variants={letterVariants} className="inline-block whitespace-pre">
-                    {char}
-                  </motion.span>
+                {" "}
+                {"QUE TRANSFORMAN NEGOCIOS.".split(" ").map((word, index) => (
+                  <span key={`char-3-${index}`} className="hero-word inline-block mr-[0.25em] opacity-0 invisible">
+                    {word}
+                  </span>
                 ))}
-              </motion.h1>
+              </h1>
 
               {/* Sub-headline */}
               <p className="text-sm md:text-base font-light text-gray-muted max-w-2xl leading-relaxed mt-8">
@@ -192,7 +321,7 @@ export default function Home() {
               <div className="flex flex-wrap gap-4 mt-12 w-full sm:w-auto">
                 <button
                   onClick={() => handleScrollTo("portafolio")}
-                  className="relative overflow-visible px-8 py-4 text-xs font-bold uppercase tracking-widest border border-gray-900 text-gray-dark hover:text-[#00319A] hover:border-[#00319A] transition-all duration-300 rounded-none cursor-pointer group"
+                  className="hero-btn relative overflow-visible px-8 py-4 text-xs font-bold uppercase tracking-widest border border-gray-900 text-gray-dark hover:text-[#00319A] hover:border-[#00319A] transition-all duration-300 rounded-none cursor-pointer group"
                 >
                   <motion.span 
                     className="absolute -inset-0.5 border border-gray-300 pointer-events-none rounded-none opacity-0"
@@ -212,7 +341,7 @@ export default function Home() {
                 
                 <button
                   onClick={() => handleScrollTo("contacto")}
-                  className="group relative overflow-visible px-8 py-4 text-xs font-black uppercase tracking-widest bg-[#00319A] hover:bg-[#00226b] text-white transition-all duration-300 rounded-none flex items-center justify-center gap-1.5 cursor-pointer"
+                  className="hero-btn group relative overflow-visible px-8 py-4 text-xs font-black uppercase tracking-widest bg-[#00319A] hover:bg-[#00226b] text-white transition-all duration-300 rounded-none flex items-center justify-center gap-1.5 cursor-pointer"
                 >
                   <motion.span 
                     className="absolute -inset-0.5 border border-[#00319A] pointer-events-none rounded-none opacity-0"
@@ -256,13 +385,14 @@ export default function Home() {
           <div className="max-w-7xl mx-auto border-x border-gray-200">
             
             {/* Section Header */}
-            <div className="p-8 md:p-16 border-b border-gray-200">
+            <div className="p-8 md:p-16 border-b border-gray-200 section-header-group">
               <span className="text-xs font-bold tracking-[0.3em] text-[#00319A] uppercase block mb-3 font-jakarta">
                 02 / SERVICIOS
               </span>
               <h2 className="text-3xl md:text-5xl font-black font-jakarta tracking-tighter leading-none text-gray-dark uppercase">
                 Retícula Rígida de Soluciones.
               </h2>
+              <div className="h-[1px] bg-[#00319A] w-full mt-6 section-divider origin-left" />
             </div>
 
             {/* Services Grid with 1px border separations */}
@@ -273,7 +403,7 @@ export default function Home() {
                   <motion.div 
                     key={service.title} 
                     whileHover="hover"
-                    className="bg-white p-8 md:p-10 flex flex-col justify-between group transition-all duration-300 rounded-none relative overflow-hidden"
+                    className="service-card bg-white p-8 md:p-10 flex flex-col justify-between group transition-all duration-300 rounded-none relative overflow-hidden"
                   >
                     {/* Swim wave background gradient */}
                     <motion.div 
@@ -322,10 +452,10 @@ export default function Home() {
                       </div>
 
                       {/* Botón inferior de Detalle */}
-                      <div className="mt-12 pt-4 border-t border-gray-100 flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-gray-muted group-hover:text-[#00319A] transition-colors duration-200">
+                      <button className="vertical-details-btn w-full text-left mt-12 pt-4 border-t border-gray-100 flex items-center justify-between text-[10px] font-bold uppercase tracking-wider text-gray-muted group-hover:text-[#00319A] transition-colors duration-200 cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-[#00319A] focus-visible:text-[#00319A]">
                         <span>Detalles de Vertical</span>
                         <ArrowUpRight className="w-3.5 h-3.5" />
-                      </div>
+                      </button>
                     </div>
                   </motion.div>
                 );
@@ -334,6 +464,10 @@ export default function Home() {
 
           </div>
         </section>
+
+
+        {/* METRICS & TESTIMONIALS SECTION */}
+        <Resultados />
 
 
         {/* PORTFOLIO SHOWCASE */}
@@ -348,10 +482,11 @@ export default function Home() {
             <div className="border border-gray-200 p-8 md:p-16 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center bg-gray-50/30">
               
               {/* Coordinates panel */}
-              <div className="lg:col-span-5 border-b lg:border-b-0 lg:border-r border-gray-200 pb-8 lg:pb-0 lg:pr-8 flex flex-col gap-4">
+              <div className="lg:col-span-5 border-b lg:border-b-0 lg:border-r border-gray-200 pb-8 lg:pb-0 lg:pr-8 flex flex-col gap-4 section-header-group">
                 <span className="text-xs font-bold tracking-[0.25em] text-[#00319A] uppercase block font-jakarta">
-                  03 / ENFOQUE BINACIONAL
+                  05 / ENFOQUE BINACIONAL
                 </span>
+                <div className="h-[1px] bg-[#00319A] w-full section-divider origin-left" />
                 <div className="text-xs font-mono text-gray-muted uppercase tracking-wider leading-relaxed">
                   Reynosa, MX: 26.0908° N, 98.2778° W
                   <br />

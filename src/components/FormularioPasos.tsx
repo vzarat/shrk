@@ -1,8 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { AnimatePresence, motion as motionClient } from "framer-motion";
 import { ArrowRight, ArrowLeft, CheckCircle2, Sparkles, Smartphone, Mail } from "lucide-react";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useGSAP } from "@gsap/react";
+
+gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 type ProjectType = "marca" | "inmobiliario" | "web_dev" | "marketing";
 
@@ -14,6 +19,40 @@ export default function FormularioPasos() {
   const [contactEmail, setContactEmail] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const formRef = useRef<HTMLDivElement>(null);
+
+  useGSAP(() => {
+    const container = formRef.current;
+    if (!container) return;
+
+    const line = container.querySelector(".section-divider");
+    const text = container.querySelectorAll("span, h2, p");
+    if (!line) return;
+
+    gsap.set(line, { scaleX: 0 });
+    gsap.set(text, { autoAlpha: 0 });
+
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: container,
+        start: "top 80%",
+        toggleActions: "play none none none"
+      }
+    });
+
+    tl.to(line, {
+      scaleX: 1,
+      duration: 0.9,
+      ease: "power2.inOut",
+      willChange: "transform"
+    })
+    .to(text, {
+      autoAlpha: 1,
+      duration: 0.6,
+      ease: "power2.out",
+      stagger: 0.08
+    }, "-=0.6");
+  }, { scope: formRef });
 
   const handleProjectTypeSelect = (type: ProjectType) => {
     setProjectType(type);
@@ -81,17 +120,18 @@ export default function FormularioPasos() {
   };
 
   return (
-    <section id="contacto" className="py-24 relative overflow-hidden bg-white border-t border-gray-200">
+    <section ref={formRef} id="contacto" className="py-24 relative overflow-hidden bg-white border-t border-gray-200">
       
       <div className="max-w-3xl mx-auto px-6">
         {/* Section Title */}
-        <div className="mb-16">
+        <div className="mb-16 section-header-group">
           <span className="text-xs font-bold tracking-[0.25em] text-[#00319A] uppercase block mb-3 font-jakarta">
-            04 / HAGAMOS HISTORIA
+            06 / HAGAMOS HISTORIA
           </span>
           <h2 className="text-3xl md:text-5xl font-black font-jakarta tracking-tighter text-gray-dark uppercase mb-4">
             Comienza tu proyecto
           </h2>
+          <div className="h-[1px] bg-[#00319A] w-full mb-6 section-divider origin-left" />
           <p className="text-sm font-light text-gray-muted max-w-lg">
             Cada gran proyecto comienza con una visión clara. Comparte la tuya y transformémosla en realidad comercial.
           </p>

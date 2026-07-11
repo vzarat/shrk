@@ -1,13 +1,48 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Menu, X, ArrowUpRight } from "lucide-react";
+import { gsap } from "gsap";
+import { useGSAP } from "@gsap/react";
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
+  const headerRef = useRef<HTMLDivElement>(null);
+
+  useGSAP(() => {
+    const btns = gsap.utils.toArray<HTMLElement>(".nav-cta-btn");
+    if (btns.length === 0) return;
+
+    const listeners = btns.map((btn) => {
+      const enter = () => gsap.to(btn, { scale: 1.05, duration: 0.25, ease: "power2.out" });
+      const leave = () => gsap.to(btn, { scale: 1, duration: 0.25, ease: "power2.inOut" });
+      const down = () => gsap.to(btn, { scale: 0.97, duration: 0.1, ease: "power2.out" });
+      const up = () => gsap.to(btn, { scale: 1.05, duration: 0.15, ease: "power2.out" });
+
+      btn.addEventListener("mouseenter", enter);
+      btn.addEventListener("mouseleave", leave);
+      btn.addEventListener("mousedown", down);
+      btn.addEventListener("mouseup", up);
+      btn.addEventListener("focus", enter);
+      btn.addEventListener("blur", leave);
+
+      return { btn, enter, leave, down, up };
+    });
+
+    return () => {
+      listeners.forEach(({ btn, enter, leave, down, up }) => {
+        btn.removeEventListener("mouseenter", enter);
+        btn.removeEventListener("mouseleave", leave);
+        btn.removeEventListener("mousedown", down);
+        btn.removeEventListener("mouseup", up);
+        btn.removeEventListener("focus", enter);
+        btn.removeEventListener("blur", leave);
+      });
+    };
+  }, { scope: headerRef });
 
   useEffect(() => {
     const handleScroll = () => {
@@ -58,6 +93,7 @@ export default function Header() {
 
   return (
     <header
+      ref={headerRef}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-white ${
         isVisible ? "translate-y-0" : "-translate-y-full"
       } ${
@@ -104,7 +140,7 @@ export default function Header() {
           <a
             href="#contacto"
             onClick={(e) => handleScrollTo(e, "contacto")}
-            className="group inline-flex items-center justify-center px-5 py-2.5 text-xs font-bold tracking-widest uppercase border border-gray-300 text-gray-dark bg-transparent hover:bg-[#00319A] hover:text-white hover:border-[#00319A] transition-all duration-200 rounded-none"
+            className="nav-cta-btn group inline-flex items-center justify-center px-5 py-2.5 text-xs font-bold tracking-widest uppercase border border-gray-300 text-gray-dark bg-transparent hover:bg-[#00319A] hover:text-white hover:border-[#00319A] transition-all duration-200 rounded-none"
           >
             <span className="flex items-center gap-1.5">
               Iniciar Proyecto
@@ -150,7 +186,7 @@ export default function Header() {
         <a
           href="#contacto"
           onClick={(e) => handleScrollTo(e, "contacto")}
-          className="w-full text-center py-3 text-xs font-bold tracking-widest uppercase bg-[#00319A] text-white hover:bg-brand-blue-hover transition-colors duration-200 rounded-none"
+          className="nav-cta-btn w-full text-center py-3 text-xs font-bold tracking-widest uppercase bg-[#00319A] text-white hover:bg-brand-blue-hover transition-colors duration-200 rounded-none"
         >
           Iniciar Proyecto
         </a>

@@ -1,9 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useGSAP } from "@gsap/react";
+
+gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 interface Project {
   id: number;
@@ -47,6 +52,40 @@ const projects: Project[] = [
 
 export default function PortfolioShowcase() {
   const [filter, setFilter] = useState<"todos" | "gourmet" | "inmobiliario" | "web">("todos");
+  const sectionRef = useRef<HTMLDivElement>(null);
+
+  useGSAP(() => {
+    const container = sectionRef.current;
+    if (!container) return;
+
+    const line = container.querySelector(".section-divider");
+    const text = container.querySelectorAll("span, h2");
+    if (!line) return;
+
+    gsap.set(line, { scaleX: 0 });
+    gsap.set(text, { autoAlpha: 0 });
+
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: container,
+        start: "top 80%",
+        toggleActions: "play none none none"
+      }
+    });
+
+    tl.to(line, {
+      scaleX: 1,
+      duration: 0.9,
+      ease: "power2.inOut",
+      willChange: "transform"
+    })
+    .to(text, {
+      autoAlpha: 1,
+      duration: 0.6,
+      ease: "power2.out",
+      stagger: 0.08
+    }, "-=0.6");
+  }, { scope: sectionRef });
 
   const filteredProjects = filter === "todos"
     ? projects
@@ -60,18 +99,19 @@ export default function PortfolioShowcase() {
   ] as const;
 
   return (
-    <section id="portafolio" className="py-24 border-t border-gray-200 bg-white">
+    <section ref={sectionRef} id="portafolio" className="py-24 border-t border-gray-200 bg-white">
       <div className="max-w-7xl mx-auto px-6">
         
         {/* Section Header & Filters */}
         <div className="flex flex-col lg:flex-row lg:items-end justify-between mb-16 gap-8 pb-8 border-b border-gray-200">
-          <div className="max-w-xl">
+          <div className="max-w-xl section-header-group">
             <span className="text-xs font-bold tracking-[0.25em] text-[#00319A] uppercase block mb-3 font-jakarta">
-              02 / PROYECTOS DESTACADOS
+              04 / PROYECTOS DESTACADOS
             </span>
             <h2 className="text-3xl md:text-5xl font-black font-jakarta tracking-tighter leading-none text-gray-dark uppercase">
               Estética funcional.
             </h2>
+            <div className="h-[1px] bg-[#00319A] w-full mt-6 section-divider origin-left" />
           </div>
 
           {/* Filters - Squared Grid layout */}
