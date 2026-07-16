@@ -120,12 +120,12 @@ export default function Resultados() {
 
   return (
     <section ref={sectionRef} id="resultados" className="bg-white">
-      <div className="max-w-7xl mx-auto border-x border-gray-200">
+      <div className="max-w-7xl mx-auto border-x border-t border-gray-200">
         
         {/* Section Header */}
         <div className="p-8 md:p-16 border-b border-gray-200 section-header-group">
           <span className="text-xs font-bold tracking-[0.3em] text-[#00319A] uppercase block mb-3 font-jakarta">
-            03 / RESULTADOS Y CONFIANZA
+            04 / RESULTADOS Y CONFIANZA
           </span>
           <h2 className="text-3xl md:text-5xl font-black font-jakarta tracking-tighter leading-none text-gray-dark uppercase">
             Métricas que respaldan la estética.

@@ -106,7 +106,7 @@ export default function PortfolioShowcase() {
         <div className="flex flex-col lg:flex-row lg:items-end justify-between mb-16 gap-8 pb-8 border-b border-gray-200">
           <div className="max-w-xl section-header-group">
             <span className="text-xs font-bold tracking-[0.25em] text-[#00319A] uppercase block mb-3 font-jakarta">
-              04 / PROYECTOS DESTACADOS
+              05 / PROYECTOS DESTACADOS
             </span>
             <h2 className="text-3xl md:text-5xl font-black font-jakarta tracking-tighter leading-none text-gray-dark uppercase">
               Estética funcional.

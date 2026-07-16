@@ -17,6 +17,8 @@ import {
 
 import Header from "@/components/Header";
 import PortfolioShowcase from "@/components/PortfolioShowcase";
+import ReelsMovimiento from "@/components/ReelsMovimiento";
+import TetrisBrutalista from "@/components/TetrisBrutalista";
 import FormularioPasos from "@/components/FormularioPasos";
 import Resultados from "@/components/Resultados";
 import { motion } from "framer-motion";
@@ -362,18 +364,9 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Right Spacer & Technical Watermark Column */}
-            <div className="lg:col-span-4 p-8 md:p-12 flex flex-col justify-between bg-gray-50/50">
-              <div className="flex flex-col gap-2 border-b border-gray-200 pb-8 text-xs font-bold text-gray-muted tracking-wider uppercase font-jakarta">
-                <span>SHRK Media Studio</span>
-                <span>Product Design Portfolio</span>
-                <span className="text-[#00319A]">Edición 2026</span>
-              </div>
-              <div className="text-[10px] text-gray-muted uppercase tracking-widest leading-relaxed font-mono mt-8">
-                <span>REYNOSA, TAM, MX / MCALLEN, TX, US</span>
-                <br />
-                <span>ESTADO: DISPONIBLE PARA NUEVOS PROYECTOS</span>
-              </div>
+            {/* Right Spacer & Technical Column with Tetris animation background */}
+            <div className="lg:col-span-4 h-full">
+              <TetrisBrutalista />
             </div>
 
           </div>
@@ -466,9 +459,11 @@ export default function Home() {
         </section>
 
 
+        {/* REELS SHOWCASE */}
+        <ReelsMovimiento />
+
         {/* METRICS & TESTIMONIALS SECTION */}
         <Resultados />
-
 
         {/* PORTFOLIO SHOWCASE */}
         <PortfolioShowcase />
@@ -484,7 +479,7 @@ export default function Home() {
               {/* Coordinates panel */}
               <div className="lg:col-span-5 border-b lg:border-b-0 lg:border-r border-gray-200 pb-8 lg:pb-0 lg:pr-8 flex flex-col gap-4 section-header-group">
                 <span className="text-xs font-bold tracking-[0.25em] text-[#00319A] uppercase block font-jakarta">
-                  05 / ENFOQUE BINACIONAL
+                  06 / ENFOQUE BINACIONAL
                 </span>
                 <div className="h-[1px] bg-[#00319A] w-full section-divider origin-left" />
                 <div className="text-xs font-mono text-gray-muted uppercase tracking-wider leading-relaxed">
