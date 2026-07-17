@@ -72,3 +72,21 @@ body {
   box-shadow: 6px 6px 0px rgba(0, 49, 154, 0.08);
 }
 
+@utility terminal-cursor {
+  &::after {
+    content: "";
+    display: inline-block;
+    width: 6px;
+    height: 0.85em;
+    background-color: #00319A;
+    margin-left: 6px;
+    vertical-align: -0.05em;
+    animation: cursor-blink 1s step-end infinite;
+  }
+}
+
+@keyframes cursor-blink {
+  from, to { opacity: 1; }
+  50% { opacity: 0; }
+}
+
